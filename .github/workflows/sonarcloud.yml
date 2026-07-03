@@ -19,9 +19,8 @@ jobs:
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
-
     env:
-      SONAR_PROJECT_KEY: Sambit-rgb_Kt-Seal
+      SONAR_PROJECT_KEY: Sambit-rgb_Kt-mihon
       SONAR_ORGANIZATION: sambit-rgb
 
     steps:
@@ -37,7 +36,7 @@ jobs:
           java-version: "17"
           cache: gradle
 
-      - name: Cache SonarCloud
+      - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
@@ -45,49 +44,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-sonar
 
-      - name: Make Gradle Wrapper Executable
+      - name: Make gradlew executable
         run: chmod +x gradlew
-        continue-on-error: true
 
-      ####################################################################
-      # Build project (best effort)
-      ####################################################################
       - name: Build Project
-        run: |
-          ./gradlew assembleDebug --stacktrace || true
-        continue-on-error: true
+        run: ./gradlew build -x test --stacktrace
 
-      ####################################################################
-      # Detect if Sonar Gradle plugin exists
-      ####################################################################
-      - name: Detect Sonar Plugin
-        id: sonarplugin
-        run: |
-          if grep -R "org.sonarqube" . >/dev/null 2>&1; then
-            echo "plugin=true" >> $GITHUB_OUTPUT
-          else
-            echo "plugin=false" >> $GITHUB_OUTPUT
-          fi
-
-      ####################################################################
-      # Preferred: Gradle Sonar Scan
-      ####################################################################
-      - name: Run Sonar via Gradle
-        if: steps.sonarplugin.outputs.plugin == 'true'
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ./gradlew sonar \
-            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-            -Dsonar.organization=${SONAR_ORGANIZATION} \
-            --stacktrace || true
-
-      ####################################################################
-      # Fallback: SonarCloud GitHub Action
-      ####################################################################
-      - name: Run SonarCloud Scanner
-        if: steps.sonarplugin.outputs.plugin == 'false'
+      - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -95,10 +58,12 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=Sambit-rgb_Kt-Seal
+            -Dsonar.organization=sambit-rgb
             -Dsonar.sources=.
+            -Dsonar.exclusions=**/build/**,**/*.min.js,**/resources/**,**/*.xml
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.scm.provider=git
-            -Dsonar.java.binaries=.
+            -Dsonar.java.binaries=**/build/classes/**
+            -Dsonar.kotlin.source.version=1.9
             -Dsonar.verbose=true
