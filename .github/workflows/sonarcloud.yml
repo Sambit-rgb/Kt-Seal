@@ -43,12 +43,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: List available tasks (debug helper)
-        run: ./gradlew tasks --all | grep -i ktfmt || echo "no ktfmt tasks found"
-        continue-on-error: true
-
       - name: Build Project (skip formatting checks)
-        run: ./gradlew build -x test -x ktfmtCheck --stacktrace
+        run: ./gradlew build -x test -x ktfmtCheckMain -x ktfmtCheckTest --stacktrace
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
