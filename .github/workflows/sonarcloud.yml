@@ -17,7 +17,7 @@ jobs:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
     env:
-      SONAR_PROJECT_KEY: Sambit-rgb_Kt-mihon
+      SONAR_PROJECT_KEY: Sambit-rgb_Kt-Seal
       SONAR_ORGANIZATION: sambit-rgb
     steps:
       - name: Checkout Repository
@@ -54,8 +54,8 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.projectKey=Sambit-rgb_Kt-Seal
-            -Dsonar.organization=sambit-rgb
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
             -Dsonar.sources=.
             -Dsonar.exclusions=**/build/**,**/*.min.js,**/resources/**,**/*.xml
             -Dsonar.sourceEncoding=UTF-8
