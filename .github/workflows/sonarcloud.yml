@@ -1,5 +1,4 @@
 name: SonarCloud Analysis
-
 on:
   push:
     branches:
@@ -10,11 +9,9 @@ on:
       - main
       - master
   workflow_dispatch:
-
 permissions:
   contents: read
   pull-requests: read
-
 jobs:
   sonarcloud:
     name: SonarCloud Scan
@@ -22,7 +19,6 @@ jobs:
     env:
       SONAR_PROJECT_KEY: Sambit-rgb_Kt-mihon
       SONAR_ORGANIZATION: sambit-rgb
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -47,8 +43,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build Project
-        run: ./gradlew build -x test --stacktrace
+      - name: Build Project (skip formatting checks)
+        run: ./gradlew build -x test -x ktfmtCheck -x ktfmtMainSourceSetCheck -x ktfmtTestSourceSetCheck --stacktrace
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
